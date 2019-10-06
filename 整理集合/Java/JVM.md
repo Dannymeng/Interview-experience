@@ -86,6 +86,7 @@ class在被加载的时候被放入永久区域，它和存放实例不同，GC�
 以 GC Roots 为起始点进行搜索，可达的对象都是存活的，不可达的对象可被回收。
 
 Java 虚拟机使用该算法来判断对象是否可被回收，GC Roots 一般包含以下内容：
+*   系统类加载器（bootstrap）加载的类
 
 *   虚拟机栈中局部变量表中引用的对象
 
@@ -342,7 +343,7 @@ public static final int i = 1；
 
 在JVM中有三中类加载器，BootStrap Classloader（启动Classloader）、Extension Classloader（扩展Classloader）和APP Classloader（应用Classloader）；
 
-BootStrap ClassLoader主要加载JVM自身需要的类，这个加载器由C++编写是虚拟机的一部分，负责加载 JAVA_HOME\lib 目录中的，或通过-Xbootclasspath参数指定路径中的，且被虚拟机认可（按文件名识别，如rt.jar）的类。
+BootStrap ClassLoader主要加载JVM自身需要的类，这个加载器由C++编写是虚拟机的一部分，负责加载 JAVA_HOME\lib 目录中的，或通过-Xbootclasspath参数指定路径中的，且被虚拟机认可（按文件名识别，如rt.jar）的类。
 
 Extension Classloader是sun.misc.Launcher中的内部类ExtClassLoader，负责加载 JAVA_HOME\lib\ext 目录中的，或通过java.ext.dirs系统变量指定路径中的类库。
 
@@ -363,7 +364,7 @@ APP ClassLoader是sun.misc.Launcher中的内部类AppClassLoader，负责加载�
 Java框架(rt.jar)如何加载应用的类？
 
 比如：javax.xml.parsers包中定义了xml解析的类接口
-Service Provider Interface SPI 位于rt.jar 
+Service Provider Interface SPI 位于rt.jar 
 即接口在启动ClassLoader中。
 而SPI的实现类，在AppLoader。
 
@@ -377,4 +378,8 @@ JDK中提供了一个方法：
 
 用以解决顶层ClassLoader无法访问底层ClassLoader的类的问题；
 基本思想是，在顶层ClassLoader中，传入底层ClassLoader的实例。
+
+
+[🔍 | 参考1]([https://www.cnblogs.com/damon9094/p/8881185.html](https://www.cnblogs.com/damon9094/p/8881185.html))
+
 
