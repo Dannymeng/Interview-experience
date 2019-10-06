@@ -10,9 +10,10 @@ JVM ： java虚拟机，是操作系统识别java程序的工具
 
 ## 一、JVM模块
 
-![](https://github.com/Dannymeng/picture/raw/master/1554821499-5b45f56308c87_articlex.png?raw=true)
 
-![](https://images2017.cnblogs.com/blog/1072930/201712/1072930-20171229170534570-429539433.png)
+<div align="center"> <img src="https://github.com/Dannymeng/picture/raw/master/1554821499-5b45f56308c87_articlex.png?raw=true"/> </div><br>
+<div align="center"> <img src="https://images2017.cnblogs.com/blog/1072930/201712/1072930-20171229170534570-429539433.png"/> </div><br>
+
 
 ## 程序计数器
 
