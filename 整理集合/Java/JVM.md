@@ -184,9 +184,10 @@ JVM给了三种选择：
 * 回收整个Java堆（新生代和老年代）
   * G1收集器
 
-![7种垃圾收集器](https://github.com/Dannymeng/picture/blob/master/20170102225015393.png?raw=true)
+<div align="center"> <img src="https://github.com/Dannymeng/picture/blob/master/20170102225015393.png?raw=true"/> </div><br>
 
-![各个垃圾收集器特点及其应用场景](https://github.com/Dannymeng/picture/blob/master/20190618102726779.png?raw=true)
+<div align="center"> <img src="https://github.com/Dannymeng/picture/blob/master/20190618102726779.png?raw=true"/> </div><br>
+
 
 **新生代垃圾回收器**
 
