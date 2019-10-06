@@ -290,3 +290,91 @@ G1收集器的运作大致可划分  为一下步骤：
 　　3、最终标记（标记那些在并发标记阶段发生变化的对象，将被回收）；
 
 　　4、筛选回收（首先对各个Regin的回收价值和成本进行排序，根据用户所期待的GC停顿时间指定回收计划，回收一部分Region）。
+
+## 类加载机制
+
+编写的java代码会通过编译器编译成字节编码的.class文件，再把字节编码加载到JVM中，映射到内存的各个区域中，程序就可以在内存中运行了。
+
+![类加载过程](https://github.com/Dannymeng/picture/blob/master/352511-20170825174319746-900347526.png?raw=true)
+
+### 1、加载
+
+加载是类装载的第一步，内存中生成一个代表这个类的java.lang.class对象，通过class文件的路径读取到二进制流，并解析二进制里的元数据（类型，常量等），作为方法区这个类的各种数据量的入口；这里的不一定从class文件获取，这里既可以从ZIP包（jar,war）包中获取，也在运行时动态生成（jsp转换成class文件，动态代理生成）。
+
+### 2、连接
+
+连接又可分为验证，准备，解析。
+
+2.1，验证
+
+验证主要是判断class文件的合法性，对版本号进行验证（例如如果使用java1.8编译后的class文件要再java1.6虚拟机上运行），还会对元数据，字节编码等进行验证，确保class文件里的字节流信息符合当前虚拟机的要求，不会危害虚拟机的安全。
+
+2.2，准备
+
+准备主要是分配内存，为变量分配初始值，即在方法区中分配这些变量所使用的内存空间，例如：
+
+public static int i = 1；
+
+在准备阶段i的值会被初始化为0，后面的类的初始化阶段才会赋值为1；
+
+public static final int i = 1；
+
+对应常量（static final）i，在准备阶段就会被赋值1；
+
+2.3，解析
+
+解析就是把代码中的符号引用替换为直接引用；例如某个类继承了java.lang.Object，原来的符号引用记录的是“java.lang.Object”，并不是java.lang,Object对象,直接引用就是找出对应的java.lang.Object对应的内存地址，建立直接引用关系；
+
+### 3、初始化
+
+初始化的过程包括执行类构造器方法，static变量赋值语句，static{}代码块，如果是一个子类进行初始化会先对其父类进行初始化，保证其父类在子类之前进行初始化；所以其实在java中初始化一个类，那么必然是先初始化java.lang.Object，因为所有的java类都继承自java.lang.Object。
+
+以下几种情况不会执行类初始化：
+
+*   通过子类引用父类的静态字段，只会触发父类的初始化，而不会触发子类的初始化。
+*   定义对象数组，不会触发该类的初始化。
+*   常量在编译期间会存入调用类的常量池中，本质上并没有直接引用定义常量的类，不会触发定义常量所在的类。
+*   通过类名获取Class对象，不会触发类的初始化。
+*   通过Class.forName加载指定类时，如果指定参数initialize为false时，也不会触发类初始化，其实这个参数是告诉虚拟机，是否要对类进行初始化。
+*   通过ClassLoader默认的loadClass方法，也不会触发初始化动作。
+
+类加载器
+
+在JVM中有三中类加载器，BootStrap Classloader（启动Classloader）、Extension Classloader（扩展Classloader）和APP Classloader（应用Classloader）；
+
+BootStrap ClassLoader主要加载JVM自身需要的类，这个加载器由C++编写是虚拟机的一部分，负责加载 JAVA_HOME\lib 目录中的，或通过-Xbootclasspath参数指定路径中的，且被虚拟机认可（按文件名识别，如rt.jar）的类。
+
+Extension Classloader是sun.misc.Launcher中的内部类ExtClassLoader，负责加载 JAVA_HOME\lib\ext 目录中的，或通过java.ext.dirs系统变量指定路径中的类库。
+
+APP ClassLoader是sun.misc.Launcher中的内部类AppClassLoader，负责加载用户路径上的类库。
+
+用户也可以通过继承ClassLoader实现自己的类加载器。
+
+双亲委派模式
+
+当一个类加载器接收到类加载的任务时，会首先交给其父类加载器去加载，只有当父类加载器无法加载是其才会自己加载。其好处是可以避免一个类被重复加载。
+
+即使两个类来源于相同的class文件，如果使用的类加载器不同，加载后的对象时完全不同的，这个不同反应在对象的 equals()、isAssignableFrom()、isInstance()等方法的返回结果，也包括了使用 instanceof 关键字对对象所属关系的判定结果。
+
+#### 双亲委派模式的问题
+
+顶层ClassLoader，无法加载底层ClassLoader的类
+
+Java框架(rt.jar)如何加载应用的类？
+
+比如：javax.xml.parsers包中定义了xml解析的类接口
+Service Provider Interface SPI 位于rt.jar 
+即接口在启动ClassLoader中。
+而SPI的实现类，在AppLoader。
+
+这样就无法用BootstrapClassLoader去加载SPI的实现类。
+
+##### 解决
+
+JDK中提供了一个方法：
+
+   1:  Thread. setContextClassLoader()
+
+用以解决顶层ClassLoader无法访问底层ClassLoader的类的问题；
+基本思想是，在顶层ClassLoader中，传入底层ClassLoader的实例。
+
