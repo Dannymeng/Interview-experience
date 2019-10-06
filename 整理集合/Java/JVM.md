@@ -380,6 +380,6 @@ JDK中提供了一个方法：
 基本思想是，在顶层ClassLoader中，传入底层ClassLoader的实例。
 
 
-[🔍 | 参考1](https://www.cnblogs.com/damon9094/p/8881185.html)
+[🔍 | 参考1](https://www.cnblogs.com/damon9094/p/8881185.html?_blank)
 
 
