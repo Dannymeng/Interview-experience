@@ -1,0 +1,14 @@
+```scala
+//scala - spark wordcount
+object WordCount {
+  def main(args: Array[String]): Unit = {
+    //非常重要，是通向Spark集群的入口
+    val conf = new SparkConf().setAppName("WordCound").setMaster("local[2]")
+    val sc = new SparkContext(conf)
+    val lines = sc.textFile(args(0))
+    lines.flatMap(_.split(" "))
+      .map((_, 1)).reduceByKey(_ + _).sortBy(_._2, false).collect().foreach(println)
+    sc.stop()
+  }
+}
+```
